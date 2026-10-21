@@ -1,20 +1,24 @@
 # 版本记录 · 06-安装包（单版本制：本目录只保留最新版文件）
 
-版本: 20261021-r1
-打包时间: 2026-10-21 21:00 (CST)
-来源设备: equuleus / SN 225bd9ea / Debian 13 + 6.19.14 #48
+版本: 20261022-r2
+打包时间: 2026-10-22 00:30 (CST)
+来源设备: equuleus / SN 225bd9ea / Debian 13 + 6.19.14 #48（WiFi 全链修复后）
 
-## 基线内容
-- 引导: UEFI(edk2-msm, boot分区6.66M) → ESP(BOOTAA64.EFI, #48内核+initramfs含固件)
-- rootfs: Debian13 (数据~800M/4G镜像, 首启自动resize2fs至分区全尺寸)
-- WiFi修复链: rmtfs三补丁版(cdf5c79d) + rmtfs.service(-o /var/lib/rmtfs) + pd-mapper/tqftpserv + polaris/.jsn + EFS空位机制(安装器自动从新机提取modemst)
-- 服务: mss-start=disabled(WiFi路线A完成前勿enable) / rmtfs,pd-mapper,tqftpserv,ssh=enabled
-- SSH: /root/.ssh/authorized_keys 已含项目私钥(dagu_key)
-- 首启: first-boot.service(时钟/扩容/串口getty/ssh)
+## 基线内容（相对 r1 的关键增量）
+- **WiFi 全链自恢复**：rmtfs_auth.ko（SCM 授权模块, /lib/modules+depmod）+ mss-start ExecStartPre insmod
+- **原厂 MPSS 三件套**：mba.mbn/modem.b00-28/modem.mdt + wlanmdsp.mbn（2021 原厂, bk_modem 提取）
+  → 提取方法: mount -o loop,ro 03-备份/bk_modem.img && cp image/{mba.mbn,modem.*,wlanmdsp.mbn} polaris/
+- **udev 补装**（udevd 缺件修复, uevent 链激活）+ udevd 两个 socket enabled
+- wpa_supplicant@wlan0 自动关联（relax.conf 降级 device 依赖 + restart.conf 应对 wlan0 晚出）
+- systemd-networkd 管 wlan0 DHCP（20-wlan0.network）
+- wpa_supplicant-wlan0.conf（SSID 已配, 密码见设备）
+- rmtfs 三补丁版 + pd-mapper/tqftpserv + polaris/.jsn + EFS 空位机制（安装器自动从新机提取 modemst）
 
 ## 安装覆盖的设备状态
-- 会覆盖 sda23 (userdata) 全部数据 —— 装机前确认可清
-- boot分区仅在 --boot 时写入 (UEFI外壳); ESP/rootfs 每次都写
+- 覆盖 sda23 (userdata) 全部数据 —— 装前确认可清
+- boot 分区仅 --boot 时写入 (UEFI 外壳); ESP/rootfs 每次都写
+- 首启: first-boot.service（时钟/resize2fs至分区全尺寸/串口getty/ssh）
 
 ## 迭代史（只记文字，文件不留历史）
-- 20261021-r1 首版。基于WiFi根因链5环修复后的实机快照；显示线(两版EFI)尚未刷入, 下轮迭代合入。
+- 20261022-r2 WiFi 全链修复版（wlan0 自动关联+出网, 重启自恢复验收通过）
+- 20261021-r1 首版（修复链进行中, 已被 r2 替代）

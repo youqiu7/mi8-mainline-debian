@@ -2,7 +2,7 @@
 
 **SDM845 · mainline 6.19.14 · UEFI (edk2-msm) · Debian 13** — with a fully documented, root-caused **WiFi bring-up** on a self-built stack. 中文文档为主（证据链完整）。
 
-> 状态：Debian 13 可日常引导与联网。WiFi（WCN3990 / ath10k_snoc）已打通并联网验证；屏幕/触摸为进行中的并行工作线；电池/充电未开始。
+> 状态：Debian 13 日常可用。**WiFi 全链修复完成并重启自恢复验收通过**（wlan0 自动关联/自动 DHCP/出网，根因链 8 环见 docs/26）；屏幕/触摸并行中；电池/充电未开始。
 
 ## 为什么这个仓库有价值
 
