@@ -1,0 +1,3 @@
+[open] OK COM7 @115200
+
+[total 0 bytes]

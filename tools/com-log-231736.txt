@@ -1,0 +1,2 @@
+[init] alive 30s
+[init] alive 60s
