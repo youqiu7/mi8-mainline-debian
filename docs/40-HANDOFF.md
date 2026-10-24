@@ -11,12 +11,14 @@
 - 恢复通道（三次实战验证）：`fastboot flash mindowsesp <03-备份\锚点-20261022-0040\02-配置层\esp-full-20261022.img>` + `fastboot continue`
 - WSL 内核构建环境：`wsl.exe -d Debian -u root`，树在 `/root/k619/linux-6.19.14`，编译用 clang19（`CC=clang`，PATH 加 /usr/lib/llvm-19/bin），**initramfs 必须用 `/root/initramfs-full`**
 
-## 2. 当前设备状态（03:25 更新）
+## 2. 当前设备状态（10-24 11:30 硬件层收官）
 
-- 运行 **v53b 充电轮版**（8db9d107，6.19.14）：WiFi/BT/黑屏/充电全通
-- **屏幕：物理断电保护完成**——DRM 接管后 ea8074 驱动 probe 即 unprepare（LAB/IBB 硬件断电+背光关），开机仅 milogo 数秒亮；**换屏恢复=删 panel-samsung-ea8074.c 的 `MI8: damaged panel` 3 行 hack 重编**（27号§7）
-- **充电：全通+守护运行中**——qcom-battery 实时电量（16%）+ mi8-charge-guard 阈值服务（<20% 开充 372mA / >80% 停充微补，USB 直供服务器模式；阈值在 /etc/default/mi8-charge-guard 可调，39号）
-- **相机轮 ⏸ 挂起**：四摄双战线“软件全绿、i2c 不应答”，物理待测=DVDD(gpio99)+XVCLK。**重启任务：38号+37号+锚点-20261023-1730**
+- **硬件层适配工作已由用户宣布结束**。运行 **v53b**（8db9d107）=终态版本：WiFi/BT/屏幕断电/充电守护全通
+- **主连接通道：`ssh root@equuleus.local`**（mDNS 走 WiFi，IP 漂移不失联）；USB 10.55.0.1 兜底；串口 COM7 最后防线
+- **屏幕物理断电保护**：开机仅 milogo 数秒亮；**换屏恢复=删 panel-samsung-ea8074.c 的 `MI8: damaged panel` 3 行 hack 重编**（27号§7）
+- **充电守护运行中**：mi8-charge-guard（<40% 开充 1.5A QC DCP / >80% 停充微补 50mA，USB 直供服务器模式；阈值 /etc/default/mi8-charge-guard；39号）
+- **相机 ⏸ 挂起**（37号+38号 RESUME 手册+锚点-20261023-1730，需硬件测量）；**音频/触摸 ⏸ 未开始**（33号/32号预案，**严禁发声**约束仍在）
+- 后续方向=**服务器应用层**（用户目标：长期插电 Linux 服务器，由用户指定具体服务）
 
 ## 3. 当前任务（用户 2026-10-23 07:40 二次拍板，替代原 01:05 版）
 
