@@ -1,0 +1,43 @@
+# ath10k: add disable_vht module param (WCN3990 VHT160 firmware workaround)
+#
+# The WCN3990 ships with Qualcomm firmware WLAN.HL.2.0.c3-00534 (2019-12-18),
+# which is locked to the original modem firmware set (RRQ size check) and thus
+# cannot be upgraded on Xiaomi Mi 8 UD (equuleus).
+#
+# That firmware's VHT datapath is broken: on VHT160 APs all unicast frames are
+# silently dropped (broadcast/multicast via GTK still works), on VHT80 APs the
+# link dies after a few minutes with a beacon-loss deauth, while HT20/40
+# operation is rock solid (140 Mbps measured on 2.4 GHz).
+#
+# This patch adds a module parameter to suppress VHT capability at wiphy
+# registration, so APs negotiate HT20/40 instead. Enable via kernel cmdline:
+#
+#   ath10k_core.disable_vht=1
+#
+# NOTE: the cmdline prefix must be the KBUILD_MODNAME (ath10k_core), not
+# "ath10k" -- unknown cmdline params are silently ignored.
+#
+# Tested on equuleus (SDM845 + WCN3990, Linux 6.19.14, kernel v56b):
+# 5 GHz ch52 (DFS) now associates at HT40, DHCP/unicast 18/18 over 90 s,
+# cold-boot 12/12, 2.4 GHz unaffected.
+#
+--- a/drivers/net/wireless/ath/ath10k/mac.c
++++ b/drivers/net/wireless/ath/ath10k/mac.c
+@@
++/* Workaround: WCN3990 WLAN.HL.2.0.c3 (2019) firmware VHT160 datapath is broken
++ * (unicast frames silently dropped on VHT160 APs). Disable VHT via module
++ * param so APs fall back to HT20/40. See 40号文档 (mi8-mainline-debian).
++ */
++static bool ath10k_disable_vht;
++module_param_named(disable_vht, ath10k_disable_vht, bool, 0644);
++MODULE_PARM_DESC(disable_vht, "Disable VHT caps (broken VHT160 firmware workaround)");
++
+ static void ath10k_mac_setup_ht_vht_cap(struct ath10k *ar)
+ {
+ 	...
+ 	vht_cap = ath10k_create_vht_cap(ar);
++	if (ath10k_disable_vht) {
++		vht_cap.vht_supported = false;
++		ath10k_info(ar, "mac: VHT disabled via disable_vht param (VHT160 fw workaround)\n");
++	}
+ 	...
