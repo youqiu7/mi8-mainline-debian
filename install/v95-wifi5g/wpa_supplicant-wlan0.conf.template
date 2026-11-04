@@ -1,0 +1,15 @@
+ctrl_interface=DIR=/var/run/wpa_supplicant GROUP=netdev
+update_config=1
+country=CN
+
+network={
+	ssid="OPPO A5-5G"
+	psk=<PUT_WIFI_PASSWORD_HERE>
+	priority=20
+}
+
+network={
+    ssid="OPPO A5"
+    psk=<PUT_WIFI_PASSWORD_HERE>
+    priority=10
+}
