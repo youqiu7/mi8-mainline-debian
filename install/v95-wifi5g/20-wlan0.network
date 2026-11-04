@@ -1,0 +1,8 @@
+[Match]
+Name=wlan0
+
+[Network]
+DHCP=ipv4
+IPv6AcceptRA=no
+DNS=223.5.5.5
+DNS=119.29.29.29
