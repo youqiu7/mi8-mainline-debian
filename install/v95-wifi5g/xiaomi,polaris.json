@@ -1,0 +1,11 @@
+{
+  "name": "Xiaomi Mi 8",
+  "x-res": 1080,
+  "y-res": 2248,
+  "cutouts": [
+    {
+      "name": "notch",
+      "path": "M 260,0 h 560 v 89 h -560 Z"
+    }
+  ]
+}
